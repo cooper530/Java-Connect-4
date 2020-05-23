@@ -1,7 +1,57 @@
+import java.util.Random;
+import java.util.Scanner;
+
 public class Main {
+
     public static void main(String[] args)
     {
-        System.out.println("Hello world!");
-        System.out.println("Good day!");
+        Board board = new Board();
+        Player player = new Player("Cooper", 1);
+        Player computer = new Player("Joel", 2);
+        Random rand = new Random();
+        Scanner in = new Scanner(System.in);
+
+        //Selects who starts randomly (0 = P1 Player, 1 = P2 Computer)
+        int turn = rand.nextInt(2);
+
+        //Game Loop
+        while(true)
+        {
+            //Turn handling
+            if(turn == 0) System.out.println("It is " + player.getName() + "'s turn" + "\n");
+            else System.out.println("It is " + computer.getName() + "'s turn" + "\n");
+
+            System.out.println(board);
+
+            //Player Instance
+            if(turn == 0)
+            {
+                System.out.print("Enter row: ");
+                int row = in.nextInt();
+
+                System.out.print("Enter col: ");
+                int col = in.nextInt();
+
+                board.update(row, col, player.getMarker());
+            }
+            //Computer Instance (Random Turn)
+            else board.update(rand.nextInt(board.getRowSize()),rand.nextInt(board.getColSize()),computer.getMarker());
+
+
+            //Check if winner
+            if(board.checkBoard())
+                break;
+
+            //Changes turn
+            if (turn == 0) turn = 1;
+            else turn = 0;
+
+            System.out.println("\n");
+        }
+
+        System.out.println(board + "\n");
+        System.out.println("Game over!");
+        if(turn == 0) System.out.println(player.getName() + " won!");
+        else System.out.println(computer.getName() + " won!");
     }
 }

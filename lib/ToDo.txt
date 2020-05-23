@@ -1,0 +1,7 @@
+DONE - Create 7 col 6 row board
+DONE - Player turns
+DONE - Computer random turns
+- Dropping values
+- Overall Game Logic
+- Graphics
+- Local Multiplayer
