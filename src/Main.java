@@ -26,16 +26,22 @@ public class Main {
             //Player Instance
             if(turn == 0)
             {
-                System.out.print("Enter row: ");
-                int row = in.nextInt();
+                while(true) {
+                    System.out.print("Enter col: ");
+                    int col = in.nextInt();
 
-                System.out.print("Enter col: ");
-                int col = in.nextInt();
-
-                board.update(row, col, player.getMarker());
+                    if (!board.update(col, player.getMarker()))
+                        System.out.println("That column is full! Please try again");
+                    else
+                        break;
+                }
             }
             //Computer Instance (Random Turn)
-            else board.update(rand.nextInt(board.getRowSize()),rand.nextInt(board.getColSize()),computer.getMarker());
+            else
+                while(true)
+                    if(board.update(rand.nextInt(board.getColSize()),computer.getMarker()))
+                        break;
+
 
 
             //Check if winner

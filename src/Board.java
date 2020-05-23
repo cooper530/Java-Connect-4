@@ -9,9 +9,17 @@ public class Board {
         board = new int[6][7];
     }
 
-    public void update(int row, int col, int player)
+    public boolean update(int col, int player)
     {
-        board[row][col] = player;
+        for(int i=board.length - 1;i>=0;i--)
+        {
+            if(board[i][col] == 0)
+            {
+                board[i][col] = player;
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getRowSize()
@@ -31,33 +39,56 @@ public class Board {
 
     private boolean checkDiag()
     {
-        return true;
+        return false;
     }
 
     private boolean checkVert()
     {
-        return true;
+        return false;
     }
 
     private boolean checkHoriz()
     {
-        return true;
+        int regCounter = 0;
+        int p1Counter = 0;
+        int p2Counter = 0;
+        for(int i=0;i<board.length;i++)
+        {
+            for(int j=0;j<board[0].length;j++) {
+                if (board[i][j] == 1)
+                    p1Counter++;
+                else if(board[i][j] == 2)
+                    p2Counter++;
+                regCounter++;
+
+                if (regCounter == 4) {
+                    if (p1Counter == 4 || p2Counter == 4)
+                        return true;
+                    else
+                        j -= 3;
+                    regCounter = 0;
+                    p1Counter = 0;
+                    p2Counter = 0;
+                }
+            }
+            regCounter = 0;
+            p1Counter = 0;
+            p2Counter = 0;
+        }
+        return false;
     }
 
     public String toString()
     {
         //Starting rows
-        System.out.print("    ");
         for(int i=0;i<board[0].length;i++)
             System.out.print(i + " ");
         System.out.println(" ");
-        System.out.print("    ");
         for(int i=0;i<board[0].length;i++)
             System.out.print("- ");
         System.out.println(" ");
 
         for (int i=0;i<board.length;i++) {
-            System.out.print(i + " | ");
             for (int j = 0; j < board[0].length; j++) {
                 System.out.print(board[i][j] + " ");
             }
