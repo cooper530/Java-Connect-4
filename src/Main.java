@@ -3,13 +3,13 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) throws InterruptedException {
         Board board = new Board();
         Player player = new Player("Cooper", 1);
         Player computer = new Player("Joel", 2);
         Random rand = new Random();
         Scanner in = new Scanner(System.in);
+        Graphics window = new Graphics();
 
         //Selects who starts randomly (0 = P1 Player, 1 = P2 Computer)
         int turn = rand.nextInt(2);
@@ -18,8 +18,8 @@ public class Main {
         while(true)
         {
             //Turn handling
-            if(turn == 0) System.out.println("It is " + player.getName() + "'s turn" + "\n");
-            else System.out.println("It is " + computer.getName() + "'s turn" + "\n");
+            if(turn == 0) window.displayTurn(player.getName());//System.out.println("It is " + player.getName() + "'s turn" + "\n");
+            else window.displayTurn(computer.getName());//System.out.println("It is " + computer.getName() + "'s turn" + "\n");
 
             System.out.println(board);
 
@@ -38,9 +38,9 @@ public class Main {
             }
             //Computer Instance (Random Turn)
             else
-                while(true)
-                    if(board.update(rand.nextInt(board.getColSize()),computer.getMarker()))
-                        break;
+                do {
+                    Thread.sleep(1000);
+                } while (!board.update(rand.nextInt(board.getColSize()), computer.getMarker()));
 
 
 

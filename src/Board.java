@@ -1,4 +1,3 @@
-import java.util.*;
 public class Board {
 
     int[][] board;
@@ -44,6 +43,32 @@ public class Board {
 
     private boolean checkVert()
     {
+        int regCounter = 0;
+        int p1Counter = 0;
+        int p2Counter = 0;
+        for(int j=0;j<board[0].length;j++)
+        {
+            for(int i=0;i<board.length;i++) {
+                if (board[i][j] == 1)
+                    p1Counter++;
+                else if(board[i][j] == 2)
+                    p2Counter++;
+                regCounter++;
+
+                if (regCounter == 4) {
+                    if (p1Counter == 4 || p2Counter == 4)
+                        return true;
+                    else
+                        i -= 3;
+                    regCounter = 0;
+                    p1Counter = 0;
+                    p2Counter = 0;
+                }
+            }
+            regCounter = 0;
+            p1Counter = 0;
+            p2Counter = 0;
+        }
         return false;
     }
 

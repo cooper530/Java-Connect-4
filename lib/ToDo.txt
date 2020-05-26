@@ -1,7 +1,8 @@
 DONE - Create 7 col 6 row board
 DONE - Player turns
 DONE - Computer random turns
-- Dropping values
+DONE - Dropping values
 - Overall Game Logic
 - Graphics
 - Local Multiplayer
+- Move up title like in Minecraft logo
