@@ -13,6 +13,7 @@ public class Graphics extends JFrame {
         };
     };
     private final JLabel message = new JLabel("");
+    private int col = -1;
 
     public Graphics() throws InterruptedException {
         //Sets closing operation
@@ -22,7 +23,8 @@ public class Graphics extends JFrame {
         frame.setResizable(false);
         frame.setContentPane(panel);
         panel.setBackground(new Color(255, 255,255));
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        //panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.setLayout(null);
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -32,7 +34,7 @@ public class Graphics extends JFrame {
 
         //Loading Screen
         JLabel imageLabel = new JLabel(new ImageIcon("res/GameLogo.png"));
-        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        imageLabel.setBounds(55, 55, 389, 308);
         panel.add(imageLabel);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -45,12 +47,58 @@ public class Graphics extends JFrame {
 
     public void checkClickPos(MouseEvent e)
     {
-        int x = e.getX(), y = e.getY();
-        System.out.println(x);
-        int boardBoundLeftX = 107, boardBoundRightX = 385, boardBoundY = 235;
+        int x = e.getX(), y = e.getY(), boardBoundY = 235;
+        //col = -1;
         //Col 0
-        //if((x > boardBoundRightX && x < 143) && (y > boardBoundY))
-            System.out.println("Col 0");
+        if((x > 109 && x < 143) && (y < boardBoundY)) col = 0;
+        //Col 1
+        else if((x > 143 && x < 186) && (y < boardBoundY)) col = 1;
+        //Col 2
+        else if((x > 186 && x < 227) && (y < boardBoundY)) col = 2;
+        //Col 3
+        else if((x > 227 && x < 269) && (y < boardBoundY)) col = 3;
+        //Col 4
+        else if((x > 269 && x < 308) && (y < boardBoundY)) col = 4;
+        //Col 5
+        else if((x > 308 && x < 347) && (y < boardBoundY)) col = 5;
+        //Col 6
+        else if((x > 347 && x < 386) && (y < boardBoundY)) col = 6;
+        System.out.println(col);
+    }
+
+    public int getCol()
+    {
+        //System.out.println(col);
+        int tempCol = col;
+        col = -1;
+        return tempCol;
+    }
+
+    public void addChip(int col, int player)
+    {
+        JLabel chip;
+        //chip.setBounds();
+        if(player == 1)/*
+            chip = new JLabel(new ImageIcon("res/Red_Chip.png"));
+            if(col == 0)
+            else if(col == 1)
+            else if(col == 2)
+            else if(col == 3)
+            else if(col == 4)
+            else if(col == 5)
+            else if(col == 6)*/
+            System.out.println(1);
+        else if(player == 2)
+            /*
+            chip = new JLabel(new ImageIcon("res/Yellow_Chip.png"));
+            if(col == 0)
+            else if(col == 1)
+            else if(col == 2)
+            else if(col == 3)
+            else if(col == 4)
+            else if(col == 5)
+            else if(col == 6)*/
+            System.out.println(2);
     }
 
     /*
@@ -60,7 +108,7 @@ public class Graphics extends JFrame {
         //panel.setLayout(null);
         removeInstance(panel, this.message);
         this.message.setText("It is " + player + "'s turn");
-        //this.message.setBounds(25, 350, 500, 30);
+        this.message.setBounds(170, 290, 500, 30);
         message.setFont(new Font("Serif", Font.BOLD, 20));
         message.setAlignmentX(Component.CENTER_ALIGNMENT);
         addInstance(frame, this.message);
@@ -72,6 +120,7 @@ public class Graphics extends JFrame {
     public void initializeBoard()
     {
         JLabel board = new JLabel(new ImageIcon("res/6x7_Board.jpg"));
+        board.setBounds(109, 0, 279, 275);
         board.setAlignmentX(Component.CENTER_ALIGNMENT);
         addInstance(panel, board);
     }

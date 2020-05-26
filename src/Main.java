@@ -26,23 +26,32 @@ public class Main {
             //Player Instance
             if(turn == 0)
             {
-                while(true) {
+                int col = -1;
+                while(true) {/*
                     System.out.print("Enter col: ");
-                    int col = in.nextInt();
-
-                    if (!board.update(col, player.getMarker()))
-                        System.out.println("That column is full! Please try again");
-                    else
-                        break;
+                    int col = in.nextInt();*/
+                    try {
+                        col = window.getCol();
+                        if (!board.update(col, player.getMarker()))
+                            System.out.println("That column is full! Please try again");
+                        else
+                            break;
+                    }
+                    catch (IndexOutOfBoundsException ignored){
+                    }
                 }
+                window.addChip(col, 1);
             }
             //Computer Instance (Random Turn)
             else
-                do {
+            {
+                int compCol = -1;
+                while (!board.update(compCol, computer.getMarker())){
+                    compCol = rand.nextInt(board.getColSize());
                     Thread.sleep(1000);
-                } while (!board.update(rand.nextInt(board.getColSize()), computer.getMarker()));
-
-
+                    window.addChip(compCol, 2);
+                }
+            }
 
             //Check if winner
             if(board.checkBoard())
