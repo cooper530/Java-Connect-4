@@ -18,40 +18,42 @@ public class Main {
         while(true)
         {
             //Turn handling
-            if(turn == 0) window.displayTurn(player.getName());//System.out.println("It is " + player.getName() + "'s turn" + "\n");
-            else window.displayTurn(computer.getName());//System.out.println("It is " + computer.getName() + "'s turn" + "\n");
-
+            if(turn == 0) window.displayTurn(player.getName());
+            else window.displayTurn(computer.getName());
             System.out.println(board);
 
             //Player Instance
             if(turn == 0)
             {
-                int col = -1;
-                while(true) {/*
-                    System.out.print("Enter col: ");
-                    int col = in.nextInt();*/
-                    try {
+                int col;
+                while(true) {
+                    col = window.getCol();
+                    window.createButtons();
+
+                    while(col == -1) {
                         col = window.getCol();
-                        if (!board.update(col, player.getMarker()))
-                            System.out.println("That column is full! Please try again");
-                        else
-                            break;
+                        Thread.sleep(25);
                     }
-                    catch (IndexOutOfBoundsException ignored){
+                    if (!board.update(col, player.getMarker()))
+                        System.out.println("That column is full! Please try again");
+                    else {
+                        //System.out.println("col: " + col);
+                        window.addChip(col, board.getAvailRow(col), 1);
+                        break;
                     }
                 }
-                window.addChip(col, 1);
             }
             //Computer Instance (Random Turn)
+            /*
             else
             {
                 int compCol = -1;
                 while (!board.update(compCol, computer.getMarker())){
                     compCol = rand.nextInt(board.getColSize());
-                    Thread.sleep(1000);
-                    window.addChip(compCol, 2);
                 }
-            }
+                Thread.sleep(1000);
+                window.addChip(compCol, board.getAvailRow(compCol), 2);
+            }*/
 
             //Check if winner
             if(board.checkBoard())
@@ -65,8 +67,7 @@ public class Main {
         }
 
         System.out.println(board + "\n");
-        System.out.println("Game over!");
-        if(turn == 0) System.out.println(player.getName() + " won!");
-        else System.out.println(computer.getName() + " won!");
+        if(turn == 0) window.displayWinner(player.getName());//System.out.println(player.getName() + " won!");
+        else window.displayWinner(computer.getName());
     }
 }

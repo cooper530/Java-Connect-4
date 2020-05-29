@@ -1,3 +1,4 @@
+
 public class Board {
 
     int[][] board;
@@ -10,6 +11,8 @@ public class Board {
 
     public boolean update(int col, int player)
     {
+        if(col == -1)
+            return false;
         for(int i=board.length - 1;i>=0;i--)
         {
             if(board[i][col] == 0)
@@ -21,9 +24,16 @@ public class Board {
         return false;
     }
 
-    public int getRowSize()
+    public int getAvailRow(int col)
     {
-        return board.length;
+        for(int i =0;i<board.length;i++)
+        {
+            if(board[i][col] != 0)
+            {
+                return i;
+            }
+        }
+        return 5;
     }
 
     public int getColSize()
@@ -33,11 +43,62 @@ public class Board {
 
     public boolean checkBoard()
     {
-        return checkDiag() || checkVert() || checkHoriz();
+        return checkDiag() || checkHoriz() || checkVert();
     }
 
     private boolean checkDiag()
     {
+        int regCounter = 0;
+        int p1Counter = 0;
+        int p2Counter = 0;
+        //row
+        for(int l=0;l<board.length;l++) {
+            //col
+            for (int k = 0; k < board[0].length; k++) {
+                //row and col modifiers
+                for (int i = l, j = k; (i < k + l + 4 && i < board.length) && (j < k + 4 + l && j < board[0].length); i++, j++) {
+                    if(board[i][j] == 1) {
+                        p1Counter++;
+                    }
+                    else if(board[i][j] == 2) {
+                        p2Counter++;
+                    }
+                    if(p1Counter == 4 || p2Counter == 4)
+                        return true;
+                    if(regCounter == 4)
+                        break;
+                    regCounter++;
+                }
+                regCounter = 0;
+                p1Counter = 0;
+                p2Counter = 0;
+            }
+        }
+
+        //row
+        for(int l=0;l<board.length;l++) {
+            //col
+            for (int k = board[0].length - 1; k >= 0; k--) {
+                //row and col modifiers
+                for (int i = l, j = k;j >= 0 && i<board.length; i++, j--) {
+                    if(board[i][j] == 1) {
+                        p1Counter++;
+                    }
+                    else if(board[i][j] == 2) {
+                        p2Counter++;
+                    }
+                    if(p1Counter == 4 || p2Counter == 4)
+                        return true;
+                    if(regCounter == 3)
+                        break;
+                    regCounter++;
+                }
+                regCounter = 0;
+                p1Counter = 0;
+                p2Counter = 0;
+            }
+        }
+
         return false;
     }
 
