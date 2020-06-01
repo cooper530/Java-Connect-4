@@ -1,9 +1,0 @@
-DONE - Create 7 col 6 row board
-DONE - Player turns
-DONE - Computer random turns
-DONE - Dropping values
-- Overall Game Logic
-- Adjust to change the color of chips for player (implement in Player class)
-DONE - Graphics
-- Local Multiplayer
-- Move up title like in Minecraft logo

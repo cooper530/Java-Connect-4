@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.sql.SQLOutput;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Graphics extends JFrame {
 
@@ -10,6 +8,10 @@ public class Graphics extends JFrame {
     private final JFrame frame = new JFrame("Java Connect 4 - Cooper");
     private final JLayeredPane layeredPane;
     private final JLabel message = new JLabel("");
+    private final JLabel imageLabel;
+    //First in list
+    String playerColor = "Red";
+    String computerColor = "Red";
     private int col = -1;
 
     JButton zero;
@@ -20,7 +22,7 @@ public class Graphics extends JFrame {
     JButton five;
     JButton six;
 
-    public Graphics() throws InterruptedException {
+    public Graphics(){
         //Sets closing operation
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBackground(new Color(255, 255,255));
@@ -33,36 +35,72 @@ public class Graphics extends JFrame {
         frame.setContentPane(layeredPane);
 
         //Loading Screen
-        JLabel imageLabel = new JLabel(new ImageIcon("res/GameLogo.png"));
-        imageLabel.setBounds(55, 55, 389, 308);
+        imageLabel = new JLabel(new ImageIcon("res/GameLogo.png"));
+        imageLabel.setBounds(55, 0, 389, 308);
         layeredPane.add(imageLabel);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-        Thread.sleep(2000);
-        //Once removing something, the frame must be re-validated and repainted.
-        removeInstance(layeredPane, imageLabel);
-        //Adds Board Image
-        initializeBoard();
+        //Menu Screen
+        menuScreen();
     }
 
-    public int getCol()
+    public void menuScreen()
     {
-        int tempCol = col;
-        col = -1;
-        return tempCol;
+        AtomicBoolean submitted = new AtomicBoolean(false);
+        JButton submit = new JButton("Submit");
+        submit.setBounds(300, 375, 100, 20);
+
+        String[] colors = {"Red", "Orange", "Yellow", "Green", "Blue", "Pink", "Purple"};
+        JComboBox<String> colorPList = new JComboBox<>(colors);
+        colorPList.addActionListener(e -> playerColor = (String) colorPList.getSelectedItem());
+        colorPList.setBounds(200, 350, 70, 20);
+
+        JComboBox<String> colorCList = new JComboBox<>(colors);
+        colorCList.addActionListener(e -> computerColor = (String) colorCList.getSelectedItem());
+        colorCList.setBounds(200, 400, 70, 20);
+
+        JLabel pColor = new JLabel("Player Color");
+        JLabel cColor = new JLabel("Computer Color");
+        cColor.setBounds(100, 400, 100, 20);
+        pColor.setBounds(100, 350, 70, 20);
+
+        addInstance(layeredPane, cColor, 0);
+        addInstance(layeredPane, pColor, 0);
+        addInstance(layeredPane, colorCList, 0);
+        addInstance(layeredPane, colorPList, 0);
+        addInstance(layeredPane, submit, 0);
+        submit.addActionListener(arg0 -> {
+            try {
+                if (!playerColor.equals(computerColor)) {
+                    removeInstance(layeredPane, cColor);
+                    removeInstance(layeredPane, pColor);
+                    removeInstance(layeredPane, colorCList);
+                    removeInstance(layeredPane, colorPList);
+                    removeInstance(layeredPane, submit);
+                    removeInstance(layeredPane, imageLabel);
+                    removeInstance(layeredPane, submit);
+                    submitted.set(true);
+                    //Adds Board Image
+                    initializeBoard();
+                }
+            }catch (NullPointerException ignored){}
+        });
+        while(!submitted.get())
+        {
+        }
     }
 
     public void addChip(int col, int row, int player)
     {
         if(player == 1) {
-            JLabel redChip = new JLabel(new ImageIcon("res/Red_Chip.png"));
-            redChip.setBounds(113 + 40*col, 20 + 40*row, 32, 32);
-            addInstance(layeredPane, redChip, 0);
+            JLabel pChip = new JLabel(new ImageIcon("res/" + playerColor + "_Chip.png"));
+            pChip.setBounds(113 + 40*col, 20 + 40*row, 32, 32);
+            addInstance(layeredPane, pChip, 0);
         }
         else {
-            JLabel yellowChip = new JLabel(new ImageIcon("res/Yellow_Chip.png"));
-            yellowChip.setBounds(113 + 40*col, 20 + 40*row, 32, 32);
-            addInstance(layeredPane, yellowChip, 0);
+            JLabel cChip = new JLabel(new ImageIcon("res/" + computerColor + "_Chip.png"));
+            cChip.setBounds(113 + 40*col, 20 + 40*row, 32, 32);
+            addInstance(layeredPane, cChip, 0);
         }
     }
 
@@ -176,6 +214,13 @@ public class Graphics extends JFrame {
         removeInstance(layeredPane, four);
         removeInstance(layeredPane, five);
         removeInstance(layeredPane, six);
+    }
+
+    public int getCol()
+    {
+        int tempCol = col;
+        col = -1;
+        return tempCol;
     }
 
     /*
