@@ -1,8 +1,9 @@
+import java.io.IOException;
 import java.util.Random;
 
 public class Main {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         Board board = new Board();
         Player player = new Player("Cooper", 1);
         Player computer = new Player("Computer", 2);
