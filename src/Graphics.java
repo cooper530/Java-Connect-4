@@ -1,5 +1,8 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Graphics extends JFrame {
@@ -22,7 +25,7 @@ public class Graphics extends JFrame {
     JButton five;
     JButton six;
 
-    public Graphics(){
+    public Graphics() throws IOException {
         //Sets closing operation
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBackground(new Color(255, 255,255));
@@ -35,7 +38,8 @@ public class Graphics extends JFrame {
         frame.setContentPane(layeredPane);
 
         //Loading Screen
-        imageLabel = new JLabel(new ImageIcon("res/GameLogo.png"));
+        BufferedImage titleImage = ImageIO.read(getClass().getResource("/res/GameLogo.png"));
+        imageLabel = new JLabel(new ImageIcon(titleImage));
         imageLabel.setBounds(55, 0, 389, 308);
         layeredPane.add(imageLabel);
         frame.setLocationRelativeTo(null);
@@ -83,22 +87,23 @@ public class Graphics extends JFrame {
                     //Adds Board Image
                     initializeBoard();
                 }
-            }catch (NullPointerException ignored){}
+            }catch (NullPointerException | IOException ignored){}
         });
         while(!submitted.get())
         {
         }
     }
 
-    public void addChip(int col, int row, int player)
-    {
+    public void addChip(int col, int row, int player) throws IOException {
         if(player == 1) {
-            JLabel pChip = new JLabel(new ImageIcon("res/" + playerColor + "_Chip.png"));
+            BufferedImage pChipImage = ImageIO.read(getClass().getResource("/res/" + playerColor + "_Chip.png"));
+            JLabel pChip = new JLabel(new ImageIcon(pChipImage));
             pChip.setBounds(113 + 40*col, 20 + 40*row, 32, 32);
             addInstance(layeredPane, pChip, 0);
         }
         else {
-            JLabel cChip = new JLabel(new ImageIcon("res/" + computerColor + "_Chip.png"));
+            BufferedImage cChipImage = ImageIO.read(getClass().getResource("/res/" + computerColor + "_Chip.png"));
+            JLabel cChip = new JLabel(new ImageIcon(cChipImage));
             cChip.setBounds(113 + 40*col, 20 + 40*row, 32, 32);
             addInstance(layeredPane, cChip, 0);
         }
@@ -132,8 +137,9 @@ public class Graphics extends JFrame {
     /*
     Creates the board in the beginning of the game
      */
-    public void initializeBoard() {
-        JLabel board = new JLabel(new ImageIcon("res/6x7_Board.jpg"));
+    public void initializeBoard() throws IOException {
+        BufferedImage boardImage = ImageIO.read(getClass().getResource("/res/6x7_Board.jpg"));
+        JLabel board = new JLabel(new ImageIcon(boardImage));
         board.setBounds(109, 0, 279, 275);
         board.setAlignmentX(Component.CENTER_ALIGNMENT);
         addInstance(layeredPane, board, 0);
