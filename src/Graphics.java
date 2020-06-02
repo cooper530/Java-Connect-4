@@ -4,11 +4,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Graphics extends JFrame {
 
     //Gives it a title
-    private final JFrame frame = new JFrame("Java Connect 4 - Cooper");
+    private final JFrame frame = new JFrame("Java Connect 4");
     private final JLayeredPane layeredPane;
     private final JLabel message = new JLabel("");
     private final JLabel imageLabel;
@@ -16,6 +18,9 @@ public class Graphics extends JFrame {
     String playerColor = "Red";
     String computerColor = "Red";
     private int col = -1;
+    String p1Name = "Player 1";
+    String p2Name = "Computer";
+    AtomicReference<String> type = new AtomicReference<>("Singleplayer");
 
     JButton zero;
     JButton one;
@@ -40,33 +45,58 @@ public class Graphics extends JFrame {
         //Loading Screen
         BufferedImage titleImage = ImageIO.read(getClass().getResource("/res/GameLogo.png"));
         imageLabel = new JLabel(new ImageIcon(titleImage));
-        imageLabel.setBounds(55, 0, 389, 308);
+        imageLabel.setBounds(55, 0, 389, 170);
         layeredPane.add(imageLabel);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         //Menu Screen
         menuScreen();
+
     }
 
     public void menuScreen()
     {
+        String[] modes = {"Singeplayer", "Multiplayer"};
+        JComboBox<String> gameType = new JComboBox<>(modes);
+        gameType.addActionListener(e -> type.set((String) gameType.getSelectedItem()));
+        gameType.setBounds(200, 250, 100, 20);
+        JLabel selectGame = new JLabel("Gamemode");
+        selectGame.setBounds(100, 250, 100, 20);
+        addInstance(layeredPane, selectGame, 0);
+        addInstance(layeredPane, gameType, 0);
+
+        JLabel pName = new JLabel("Player 1 Name");
+        JLabel cName = new JLabel("Computer Name");
+        pName.setBounds(40, 300, 100, 20);
+        cName.setBounds(40, 350, 100, 20);
+
+        JTextField pNameText = new JTextField("Player 1");
+        JTextField cNameText = new JTextField("Player 2");
+        pNameText.setBounds(140, 300, 100, 20);
+        cNameText.setBounds(140, 350, 100, 20);
+
+        addInstance(layeredPane, cNameText, 0);
+        addInstance(layeredPane, pNameText, 0);
+        addInstance(layeredPane, cName, 0);
+        addInstance(layeredPane, pName, 0);
+
         AtomicBoolean submitted = new AtomicBoolean(false);
         JButton submit = new JButton("Submit");
-        submit.setBounds(300, 375, 100, 20);
+        submit.setBounds(200, 430, 100, 20);
 
         String[] colors = {"Red", "Orange", "Yellow", "Green", "Blue", "Pink", "Purple"};
         JComboBox<String> colorPList = new JComboBox<>(colors);
         colorPList.addActionListener(e -> playerColor = (String) colorPList.getSelectedItem());
-        colorPList.setBounds(200, 350, 70, 20);
+        colorPList.setBounds(390, 300, 70, 20);
 
         JComboBox<String> colorCList = new JComboBox<>(colors);
         colorCList.addActionListener(e -> computerColor = (String) colorCList.getSelectedItem());
-        colorCList.setBounds(200, 400, 70, 20);
+        colorCList.setBounds(390, 350, 70, 20);
 
-        JLabel pColor = new JLabel("Player Color");
+        JLabel pColor = new JLabel("Player 1 Color");
         JLabel cColor = new JLabel("Computer Color");
-        cColor.setBounds(100, 400, 100, 20);
-        pColor.setBounds(100, 350, 70, 20);
+        cColor.setBounds(290, 350, 100, 20);
+        pColor.setBounds(290, 300, 100, 20);
 
         addInstance(layeredPane, cColor, 0);
         addInstance(layeredPane, pColor, 0);
@@ -83,6 +113,14 @@ public class Graphics extends JFrame {
                     removeInstance(layeredPane, submit);
                     removeInstance(layeredPane, imageLabel);
                     removeInstance(layeredPane, submit);
+                    removeInstance(layeredPane, cNameText);
+                    removeInstance(layeredPane, pNameText);
+                    removeInstance(layeredPane, cName);
+                    removeInstance(layeredPane, pName);
+                    removeInstance(layeredPane, gameType);
+                    removeInstance(layeredPane, selectGame);
+                    p1Name = pNameText.getText();
+                    p2Name = cNameText.getText();
                     submitted.set(true);
                     //Adds Board Image
                     initializeBoard();
@@ -91,6 +129,13 @@ public class Graphics extends JFrame {
         });
         while(!submitted.get())
         {
+            if(type.get().equals("Multiplayer"))
+            {
+                cColor.setText("Player 2 Color");
+                cName.setText("Player 2 Name");
+                removeInstance(layeredPane, selectGame);
+                removeInstance(layeredPane, gameType);
+            }
         }
     }
 
@@ -229,6 +274,20 @@ public class Graphics extends JFrame {
         return tempCol;
     }
 
+    public String getP1Name()
+    {
+        return p1Name;
+    }
+
+    public String getP2Name()
+    {
+        return p2Name;
+    }
+
+    public boolean isComputer()
+    {
+        return type.get().equals("Singleplayer");
+    }
     /*
     Remove an instance on a frame
      */

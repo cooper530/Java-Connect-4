@@ -5,10 +5,10 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         Board board = new Board();
-        Player player = new Player("Cooper", 1);
-        Player computer = new Player("Computer", 2);
         Random rand = new Random();
         Graphics window = new Graphics();
+        Player player1 = new Player(window.getP1Name(), 1, false);
+        Player player2 = new Player(window.getP2Name(), 2, window.isComputer());
 
         //Selects who starts randomly (0 = P1 Player, 1 = P2 Computer)
         int turn = rand.nextInt(2);
@@ -17,8 +17,8 @@ public class Main {
         while(true)
         {
             //Turn handling
-            if(turn == 0) window.displayTurn(player.getName());
-            else window.displayTurn(computer.getName());
+            if(turn == 0) window.displayTurn(player1.getName());
+            else window.displayTurn(player2.getName());
             //System.out.println(board);
 
             //Player Instance
@@ -33,7 +33,7 @@ public class Main {
                         col = window.getCol();
                         Thread.sleep(25);
                     }
-                    if (!board.update(col, player.getMarker()))
+                    if (!board.update(col, player1.getMarker()))
                         System.out.println("That column is full! Please try again");
                     else {
                         //System.out.println("col: " + col);
@@ -46,12 +46,31 @@ public class Main {
 
             else
             {
-                int compCol = -1;
-                while (!board.update(compCol, computer.getMarker())){
-                    compCol = rand.nextInt(board.getColSize());
+                if(player2.isComputer()) {
+                    int compCol = -1;
+                    while (!board.update(compCol, player2.getMarker())) {
+                        compCol = rand.nextInt(board.getColSize());
+                    }
+                    Thread.sleep(1000);
+                    window.addChip(compCol, board.getAvailRow(compCol), 2);
+                }else{
+                    int col;
+                    while(true) {
+                        col = window.getCol();
+                        window.createButtons();
+
+                        while(col == -1) {
+                            col = window.getCol();
+                            Thread.sleep(25);
+                        }
+                        if (!board.update(col, player2.getMarker()))
+                            System.out.println("That column is full! Please try again");
+                        else {
+                            window.addChip(col, board.getAvailRow(col), 2);
+                            break;
+                        }
+                    }
                 }
-                Thread.sleep(1000);
-                window.addChip(compCol, board.getAvailRow(compCol), 2);
             }
 
             //Check if winner
@@ -66,7 +85,7 @@ public class Main {
         }
 
         //System.out.println(board + "\n");
-        if(turn == 0) window.displayWinner(player.getName());
-        else window.displayWinner(computer.getName());
+        if(turn == 0) window.displayWinner(player1.getName());
+        else window.displayWinner(player2.getName());
     }
 }

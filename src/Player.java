@@ -2,12 +2,14 @@ public class Player {
     private final int marker;
     private final String name;
     private final String chipColor;
+    private final boolean isComputer;
 
-    public Player(String name, int marker)
+    public Player(String name, int marker, boolean isComputer)
     {
         this.name = name;
         this.marker = marker;
         this.chipColor = "";
+        this.isComputer = isComputer;
     }
 
     public String getName()
@@ -25,4 +27,7 @@ public class Player {
         return this.chipColor;
     }
 
+    public boolean isComputer() {
+        return this.isComputer;
+    }
 }
