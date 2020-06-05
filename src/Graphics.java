@@ -13,10 +13,10 @@ public class Graphics extends JFrame {
     private final JFrame frame = new JFrame("Java Connect 4");
     private final JLayeredPane layeredPane;
     private final JLabel message = new JLabel("");
-    private JLabel imageLabel, board;
+    private JLabel imageLabel, board, winCounter;
     //First in list
     String playerColor, computerColor = "Red";
-    private int col = -1;
+    private int col = -1, p1Wins = 0, p2Wins = 0;
     String p1Name = "Player 1", p2Name = "Computer";
     AtomicReference<String> type = new AtomicReference<>("Singleplayer");
     private boolean playAgain = false;
@@ -117,6 +117,8 @@ public class Graphics extends JFrame {
                     p2Name = cNameText.getText();
                     submitted.set(true);
                     //Adds Board Image
+                    if(p1Name.equals("memes"))
+                        executeMemes();
                     initializeBoard();
                 }
             } catch (NullPointerException | IOException ignored) {
@@ -168,6 +170,7 @@ public class Graphics extends JFrame {
             removeInstance(layeredPane, startOver);
             removeInstance(layeredPane, message);
             removeInstance(layeredPane, board);
+            removeInstance(layeredPane, winCounter);
             loopVar.set(false);
         });
         addInstance(layeredPane, playAgainButton, 0);
@@ -192,7 +195,7 @@ public class Graphics extends JFrame {
     public void displayTurn(String player) {
         removeInstance(layeredPane, this.message);
         this.message.setText("It is " + player + "'s turn");
-        this.message.setBounds(100, 400, 300, 30);
+        this.message.setBounds(100, 300, 300, 30);
         message.setFont(new Font("Serif", Font.BOLD, 20));
         message.setHorizontalAlignment(JLabel.CENTER);
         addInstance(layeredPane, this.message, 0);
@@ -205,14 +208,27 @@ public class Graphics extends JFrame {
     {
         removeInstance(layeredPane, this.message);
         this.message.setText(player + " won!");
-        this.message.setBounds(100, 400, 300, 30);
+        this.message.setBounds(100, 300, 300, 30);
         message.setFont(new Font("Serif", Font.BOLD, 20));
         message.setHorizontalAlignment(JLabel.CENTER);
         addInstance(layeredPane, this.message, 0);
     }
 
+    public void updateWins(int player)
+    {
+        if(player == 1) p1Wins++;
+        else if(player == 2) p2Wins++;
+        winCounter.setText(p1Name + ": " + p1Wins + "     " + p2Name + ": " + p2Wins);
+    }
+
+    public void clearScore()
+    {
+        p1Wins = 0;
+        p2Wins = 0;
+    }
+
     /*
-    Creates the board in the beginning of the game
+    Creates the board and win counter in the beginning of the game
      */
     public void initializeBoard() throws IOException {
         BufferedImage boardImage = ImageIO.read(getClass().getResource("/res/6x7_Board.jpg"));
@@ -220,6 +236,12 @@ public class Graphics extends JFrame {
         board.setBounds(109, 0, 279, 275);
         board.setAlignmentX(Component.CENTER_ALIGNMENT);
         addInstance(layeredPane, board, 0);
+
+        winCounter = new JLabel(p1Name + ": " + p1Wins + "     " + p2Name + ": " + p2Wins);
+        winCounter.setBounds(100, 350, 300, 30);
+        winCounter.setFont(new Font("Serif", Font.BOLD, 20));
+        winCounter.setHorizontalAlignment(JLabel.CENTER);
+        addInstance(layeredPane, winCounter, 0);
     }
 
     public void createButtons()
@@ -338,5 +360,24 @@ public class Graphics extends JFrame {
         instance.add(type, level);
         instance.revalidate();
         instance.repaint();
+    }
+
+    public void executeMemes() throws IOException {
+        BufferedImage meme1 = ImageIO.read(getClass().getResource("/res/meme1.jpg"));
+        JLabel meme1Label = new JLabel(new ImageIcon(meme1));
+        meme1Label.setBounds(0, 0, 250, 250);
+        addInstance(layeredPane, meme1Label, 0);
+        BufferedImage meme2 = ImageIO.read(getClass().getResource("/res/meme2.jpg"));
+        JLabel meme2Label = new JLabel(new ImageIcon(meme2));
+        meme2Label.setBounds(250, 250, 250, 250);
+        addInstance(layeredPane, meme2Label, 0);
+        BufferedImage meme3 = ImageIO.read(getClass().getResource("/res/meme3.jpg"));
+        JLabel meme3Label = new JLabel(new ImageIcon(meme3));
+        meme3Label.setBounds(250, 0, 250, 250);
+        addInstance(layeredPane, meme3Label, 0);
+        BufferedImage meme4 = ImageIO.read(getClass().getResource("/res/meme4.jpg"));
+        JLabel meme4Label = new JLabel(new ImageIcon(meme4));
+        meme4Label.setBounds(0, 250, 250, 250);
+        addInstance(layeredPane, meme4Label, 0);
     }
 }

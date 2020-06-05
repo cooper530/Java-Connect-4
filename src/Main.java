@@ -82,8 +82,14 @@ public class Main {
             //System.out.println("\n");
         }
         //System.out.println(board + "\n");
-        if(turn == 0) window.displayWinner(player1.getName());
-        else window.displayWinner(player2.getName());
+        if(turn == 0) {
+            window.displayWinner(player1.getName());
+            window.updateWins(1);
+        }
+        else {
+            window.displayWinner(player2.getName());
+            window.updateWins(2);
+        }
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -96,6 +102,7 @@ public class Main {
                 window.gameOver();
                 window.clearChips();
             } while (window.getPlayAgain());
+            window.clearScore();
             window.menuScreen();
         }
     }
