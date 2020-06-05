@@ -3,33 +3,32 @@ import java.util.Random;
 
 public class Main {
 
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public static void playGame(Graphics window) throws IOException, InterruptedException {
         Board board = new Board();
         Random rand = new Random();
-        Graphics window = new Graphics();
         Player player1 = new Player(window.getP1Name(), 1, false);
         Player player2 = new Player(window.getP2Name(), 2, window.isComputer());
 
+        //Play Loop
         //Selects who starts randomly (0 = P1 Player, 1 = P2 Computer)
         int turn = rand.nextInt(2);
+        board.clearBoard();
 
         //Game Loop
-        while(true)
-        {
+        while (true) {
             //Turn handling
-            if(turn == 0) window.displayTurn(player1.getName());
+            if (turn == 0) window.displayTurn(player1.getName());
             else window.displayTurn(player2.getName());
             //System.out.println(board);
 
             //Player Instance
-            if(turn == 0)
-            {
+            if (turn == 0) {
                 int col;
-                while(true) {
+                while (true) {
                     col = window.getCol();
                     window.createButtons();
 
-                    while(col == -1) {
+                    while (col == -1) {
                         col = window.getCol();
                         Thread.sleep(25);
                     }
@@ -44,22 +43,21 @@ public class Main {
             }
             //Computer Instance (Random Turn)
 
-            else
-            {
-                if(player2.isComputer()) {
+            else {
+                if (player2.isComputer()) {
                     int compCol = -1;
                     while (!board.update(compCol, player2.getMarker())) {
                         compCol = rand.nextInt(board.getColSize());
                     }
                     Thread.sleep(1000);
                     window.addChip(compCol, board.getAvailRow(compCol), 2);
-                }else{
+                } else {
                     int col;
-                    while(true) {
+                    while (true) {
                         col = window.getCol();
                         window.createButtons();
 
-                        while(col == -1) {
+                        while (col == -1) {
                             col = window.getCol();
                             Thread.sleep(25);
                         }
@@ -74,7 +72,7 @@ public class Main {
             }
 
             //Check if winner
-            if(board.checkBoard())
+            if (board.checkBoard())
                 break;
 
             //Changes turn
@@ -83,9 +81,22 @@ public class Main {
 
             //System.out.println("\n");
         }
-
         //System.out.println(board + "\n");
         if(turn == 0) window.displayWinner(player1.getName());
         else window.displayWinner(player2.getName());
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        Graphics window = new Graphics();
+        while(true) {
+            do {
+                //Play Game
+                playGame(window);
+                //Handles Post-Game
+                window.gameOver();
+                window.clearChips();
+            } while (window.getPlayAgain());
+            window.menuScreen();
+        }
     }
 }

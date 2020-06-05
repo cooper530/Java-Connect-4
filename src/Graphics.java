@@ -3,8 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Graphics extends JFrame {
@@ -13,27 +13,21 @@ public class Graphics extends JFrame {
     private final JFrame frame = new JFrame("Java Connect 4");
     private final JLayeredPane layeredPane;
     private final JLabel message = new JLabel("");
-    private final JLabel imageLabel;
+    private JLabel imageLabel, board;
     //First in list
-    String playerColor = "Red";
-    String computerColor = "Red";
+    String playerColor, computerColor = "Red";
     private int col = -1;
-    String p1Name = "Player 1";
-    String p2Name = "Computer";
+    String p1Name = "Player 1", p2Name = "Computer";
     AtomicReference<String> type = new AtomicReference<>("Singleplayer");
+    private boolean playAgain = false;
+    private ArrayList<JLabel> chips = new ArrayList<>();
 
-    JButton zero;
-    JButton one;
-    JButton two;
-    JButton three;
-    JButton four;
-    JButton five;
-    JButton six;
+    JButton zero, one, two, three, four, five, six;
 
     public Graphics() throws IOException {
         //Sets closing operation
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setBackground(new Color(255, 255,255));
+        frame.setBackground(new Color(255, 255, 255));
         //Sets size of screen
         frame.setSize(500, 500);
         frame.setResizable(false);
@@ -42,20 +36,19 @@ public class Graphics extends JFrame {
         layeredPane.setLayout(null);
         frame.setContentPane(layeredPane);
 
-        //Loading Screen
+        //Menu Screen
+        menuScreen();
+
+    }
+
+    public void menuScreen() throws IOException {
         BufferedImage titleImage = ImageIO.read(getClass().getResource("/res/GameLogo.png"));
         imageLabel = new JLabel(new ImageIcon(titleImage));
         imageLabel.setBounds(55, 0, 389, 170);
         layeredPane.add(imageLabel);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-        //Menu Screen
-        menuScreen();
 
-    }
-
-    public void menuScreen()
-    {
         String[] modes = {"Singeplayer", "Multiplayer"};
         JComboBox<String> gameType = new JComboBox<>(modes);
         gameType.addActionListener(e -> type.set((String) gameType.getSelectedItem()));
@@ -103,6 +96,7 @@ public class Graphics extends JFrame {
         addInstance(layeredPane, colorCList, 0);
         addInstance(layeredPane, colorPList, 0);
         addInstance(layeredPane, submit, 0);
+        playAgain = true;
         submit.addActionListener(arg0 -> {
             try {
                 if (!playerColor.equals(computerColor)) {
@@ -125,33 +119,71 @@ public class Graphics extends JFrame {
                     //Adds Board Image
                     initializeBoard();
                 }
-            }catch (NullPointerException | IOException ignored){}
+            } catch (NullPointerException | IOException ignored) {
+            }
         });
-        while(!submitted.get())
-        {
-            if(type.get().equals("Multiplayer"))
-            {
+        while (!submitted.get()) {
+            if (type.get().equals("Multiplayer")) {
                 cColor.setText("Player 2 Color");
                 cName.setText("Player 2 Name");
-                removeInstance(layeredPane, selectGame);
-                removeInstance(layeredPane, gameType);
+            } else {
+                cColor.setText("Computer Color");
+                cName.setText("Computer Name");
             }
         }
     }
 
     public void addChip(int col, int row, int player) throws IOException {
-        if(player == 1) {
+        if (player == 1) {
             BufferedImage pChipImage = ImageIO.read(getClass().getResource("/res/" + playerColor + "_Chip.png"));
             JLabel pChip = new JLabel(new ImageIcon(pChipImage));
-            pChip.setBounds(113 + 40*col, 20 + 40*row, 32, 32);
+            pChip.setBounds(113 + 40 * col, 20 + 40 * row, 32, 32);
             addInstance(layeredPane, pChip, 0);
-        }
-        else {
+            chips.add(pChip);
+        } else {
             BufferedImage cChipImage = ImageIO.read(getClass().getResource("/res/" + computerColor + "_Chip.png"));
             JLabel cChip = new JLabel(new ImageIcon(cChipImage));
-            cChip.setBounds(113 + 40*col, 20 + 40*row, 32, 32);
+            cChip.setBounds(113 + 40 * col, 20 + 40 * row, 32, 32);
             addInstance(layeredPane, cChip, 0);
+            chips.add(cChip);
         }
+    }
+
+    public void gameOver()
+    {
+        AtomicBoolean loopVar = new AtomicBoolean(true);
+        JButton playAgainButton = new JButton("Play Again");
+        JButton startOver = new JButton("Start Over");
+        playAgainButton.setBounds(145, 430, 100, 20);
+        startOver.setBounds(255, 430, 100, 20);
+        playAgainButton.addActionListener(arg0 -> {
+            playAgain = true;
+            removeInstance(layeredPane, playAgainButton);
+            removeInstance(layeredPane, startOver);
+            loopVar.set(false);
+        });
+        startOver.addActionListener(arg0 -> {
+            playAgain = false;
+            removeInstance(layeredPane, playAgainButton);
+            removeInstance(layeredPane, startOver);
+            removeInstance(layeredPane, message);
+            removeInstance(layeredPane, board);
+            loopVar.set(false);
+        });
+        addInstance(layeredPane, playAgainButton, 0);
+        addInstance(layeredPane, startOver, 0);
+        while(loopVar.get()){}
+    }
+
+    public void clearChips()
+    {
+        for(JLabel label : chips)
+            removeInstance(layeredPane, label);
+    }
+
+    public boolean getPlayAgain()
+    {
+        return playAgain;
     }
 
     /*
@@ -160,9 +192,9 @@ public class Graphics extends JFrame {
     public void displayTurn(String player) {
         removeInstance(layeredPane, this.message);
         this.message.setText("It is " + player + "'s turn");
-        this.message.setBounds(170, 400, 500, 30);
+        this.message.setBounds(100, 400, 300, 30);
         message.setFont(new Font("Serif", Font.BOLD, 20));
-        message.setAlignmentX(Component.CENTER_ALIGNMENT);
+        message.setHorizontalAlignment(JLabel.CENTER);
         addInstance(layeredPane, this.message, 0);
     }
 
@@ -173,9 +205,9 @@ public class Graphics extends JFrame {
     {
         removeInstance(layeredPane, this.message);
         this.message.setText(player + " won!");
-        this.message.setBounds(170, 400, 500, 30);
+        this.message.setBounds(100, 400, 300, 30);
         message.setFont(new Font("Serif", Font.BOLD, 20));
-        message.setAlignmentX(Component.CENTER_ALIGNMENT);
+        message.setHorizontalAlignment(JLabel.CENTER);
         addInstance(layeredPane, this.message, 0);
     }
 
@@ -184,7 +216,7 @@ public class Graphics extends JFrame {
      */
     public void initializeBoard() throws IOException {
         BufferedImage boardImage = ImageIO.read(getClass().getResource("/res/6x7_Board.jpg"));
-        JLabel board = new JLabel(new ImageIcon(boardImage));
+        board = new JLabel(new ImageIcon(boardImage));
         board.setBounds(109, 0, 279, 275);
         board.setAlignmentX(Component.CENTER_ALIGNMENT);
         addInstance(layeredPane, board, 0);

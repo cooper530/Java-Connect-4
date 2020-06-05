@@ -1,3 +1,4 @@
+import java.util.Arrays;
 
 public class Board {
 
@@ -36,6 +37,11 @@ public class Board {
         return 5;
     }
 
+    public void clearBoard()
+    {
+        for(int[] row : board)
+            Arrays.fill(row, 0);
+    }
     public int getColSize()
     {
         return board[0].length;
