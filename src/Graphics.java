@@ -49,7 +49,7 @@ public class Graphics extends JFrame {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        String[] modes = {"Singeplayer", "Multiplayer"};
+        String[] modes = {"Singleplayer", "Multiplayer"};
         JComboBox<String> gameType = new JComboBox<>(modes);
         gameType.addActionListener(e -> type.set((String) gameType.getSelectedItem()));
         gameType.setBounds(200, 250, 100, 20);
@@ -115,6 +115,7 @@ public class Graphics extends JFrame {
                     removeInstance(layeredPane, selectGame);
                     p1Name = pNameText.getText();
                     p2Name = cNameText.getText();
+                    type.set((String) gameType.getSelectedItem());
                     submitted.set(true);
                     //Adds Board Image
                     if(p1Name.equals("memes"))
@@ -128,9 +129,11 @@ public class Graphics extends JFrame {
             if (type.get().equals("Multiplayer")) {
                 cColor.setText("Player 2 Color");
                 cName.setText("Player 2 Name");
+                //type.set((String) gameType.getSelectedItem());
             } else {
                 cColor.setText("Computer Color");
                 cName.setText("Computer Name");
+                //type.set((String) gameType.getSelectedItem());
             }
         }
     }
@@ -195,7 +198,7 @@ public class Graphics extends JFrame {
     public void displayTurn(String player) {
         removeInstance(layeredPane, this.message);
         this.message.setText("It is " + player + "'s turn");
-        this.message.setBounds(100, 300, 300, 30);
+        this.message.setBounds(100, 300, 320, 30);
         message.setFont(new Font("Serif", Font.BOLD, 20));
         message.setHorizontalAlignment(JLabel.CENTER);
         addInstance(layeredPane, this.message, 0);
@@ -242,6 +245,12 @@ public class Graphics extends JFrame {
         winCounter.setFont(new Font("Serif", Font.BOLD, 20));
         winCounter.setHorizontalAlignment(JLabel.CENTER);
         addInstance(layeredPane, winCounter, 0);
+    }
+
+    public void colFull(String player) throws InterruptedException {
+        message.setText("That column is full! Please try again.");
+        Thread.sleep(1500);
+        displayTurn(player);
     }
 
     public void createButtons()

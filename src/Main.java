@@ -33,7 +33,7 @@ public class Main {
                         Thread.sleep(25);
                     }
                     if (!board.update(col, player1.getMarker()))
-                        System.out.println("That column is full! Please try again");
+                        window.colFull(player1.getName());
                     else {
                         //System.out.println("col: " + col);
                         window.addChip(col, board.getAvailRow(col), 1);
@@ -62,7 +62,7 @@ public class Main {
                             Thread.sleep(25);
                         }
                         if (!board.update(col, player2.getMarker()))
-                            System.out.println("That column is full! Please try again");
+                            window.colFull(player2.getName());
                         else {
                             window.addChip(col, board.getAvailRow(col), 2);
                             break;
