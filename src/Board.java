@@ -1,15 +1,25 @@
 import java.util.Arrays;
 
+/*
+The Board Class handles the entire logic of the game, including the board and methods to check if the game
+has been won. An instance of this class is created in the Main Class, where the game is handled.
+ */
 public class Board {
-
+    //Board 2D Array
     int[][] board;
 
+    /*
+    The constructor creates a 6x7 Connect 4 Board
+     */
     public Board()
     {
         //[row][col]
         board = new int[6][7];
     }
 
+    /*
+    Determines whether the player can place a chip in the desired column
+     */
     public boolean update(int col, int player)
     {
         if(col == -1)
@@ -25,6 +35,9 @@ public class Board {
         return false;
     }
 
+    /*
+    Returns the next available row for a chip to be placed
+     */
     public int getAvailRow(int col)
     {
         for(int i =0;i<board.length;i++)
@@ -37,21 +50,34 @@ public class Board {
         return 5;
     }
 
+    /*
+    Clears the entire board once the game is completed
+     */
     public void clearBoard()
     {
         for(int[] row : board)
             Arrays.fill(row, 0);
     }
+
+    /*
+    Returns the size of each column
+     */
     public int getColSize()
     {
         return board[0].length;
     }
 
+    /*
+    Checks if there is a Connect 4 diagonally, horizontally, or vertically
+     */
     public boolean checkBoard()
     {
         return checkDiag() || checkHoriz() || checkVert();
     }
 
+    /*
+    Checks whether there is a Connect 4 diagonally
+     */
     private boolean checkDiag()
     {
         int regCounter = 0;
@@ -108,6 +134,9 @@ public class Board {
         return false;
     }
 
+    /*
+    Checks whether there is a Connect 4 vertically
+     */
     private boolean checkVert()
     {
         int regCounter = 0;
@@ -139,6 +168,9 @@ public class Board {
         return false;
     }
 
+    /*
+    Checks whether there is a Connect 4 horizontally
+     */
     private boolean checkHoriz()
     {
         int regCounter = 0;
@@ -170,6 +202,9 @@ public class Board {
         return false;
     }
 
+    /*
+    Prints the board to the console
+     */
     public String toString()
     {
         //Starting rows
