@@ -1,5 +1,13 @@
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.ConnectException;
+import java.net.Socket;
 import java.util.Random;
+import java.util.Scanner;
 
 /*
 The Main Class handles all the game mechanics and all the other classes in the program. The game is launched
@@ -103,6 +111,96 @@ public class Main {
             window.updateWins(2);
         }
     }
+    /*
+    TOMORROW: Why do the clients disconnect when connecting to the server? Resets name, color, and entire program
+     */
+    public static void playOnline(Graphics window, Socket socket) throws IOException, InterruptedException {
+        Scanner input = new Scanner(socket.getInputStream());
+        PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+
+        //Creates Board
+        Board localBoard = new Board();
+        window.initLocalBoard();
+
+        //Sends name/chip color to server
+        output.println(window.getP1Name());
+        output.println(window.getLocalPlayerColor());
+
+
+        //Handles messages from the server
+        while(input.hasNextLine()) {
+            String response = input.nextLine();
+            System.out.println(response);
+            if (response.startsWith("MESSAGE")) {
+                window.displayMessage(response.substring(8));
+            } else if (response.startsWith("YOUR_MOVE")) {
+                window.displayTurn(window.p1Name);
+                //Updates opponent move
+                int col = Integer.parseInt(response.substring(10));
+                if(col != -1) {
+                    localBoard.update(col, 2);
+                    window.addChip(col, localBoard.getAvailRow(col), 2);
+                }
+                while (true) {
+                    col = window.getCol();
+                    window.createButtons();
+
+                    while (col == -1) {
+                        col = window.getCol();
+                        Thread.sleep(25);
+                    }
+                    //Checks if chip can be placed in desired column
+                    if (!localBoard.update(col, 1))
+                        window.colFull(window.getP1Name());
+                    else {
+                        window.addChip(col, localBoard.getAvailRow(col), 1);
+                        break;
+                    }
+                }
+                output.println("UPDATE_BOARD " + col);
+            }
+            else if (response.equals("OTHER_PLAYER_LEFT")) {
+                window.clearChips();
+                localBoard.clearBoard();
+                window.displayMessage("Opponent Disconnected");
+            }
+            else if(response.startsWith("CHIP_COLOR"))
+            {
+                //Receives chip color from server
+                String color = response.substring(11);
+                if(color.equals(window.playerColor))
+                    window.setP2Color("Orange");
+                else {
+                    window.setP2Color(color);
+                }
+            }
+            else if(response.startsWith("VICTORY"))
+            {
+                window.displayMessage("You won!");
+                Thread.sleep(2000);
+            }
+            else if(response.startsWith("DEFEAT"))
+            {
+                localBoard.update(Integer.parseInt(response.substring(7)), 2);
+                window.addChip(Integer.parseInt(response.substring(7)), localBoard.getAvailRow(Integer.parseInt(response.substring(7))), 2);
+                window.displayMessage("You lost!");
+                Thread.sleep(2000);
+            }
+            else if(response.startsWith("TIE"))
+            {
+                try {
+                    localBoard.update(Integer.parseInt(response.substring(4)), 2);
+                    window.addChip(Integer.parseInt(response.substring(4)), localBoard.getAvailRow(Integer.parseInt(response.substring(4))), 2);
+                    window.displayMessage("Tie!");
+                    Thread.sleep(2000);
+                } catch(Exception e) {
+                    window.displayMessage("Tie!");
+                    Thread.sleep(2000);
+                }
+            }
+            Thread.sleep(500);
+        }
+    }
 
     /*
     The method main runs the entire program, calling the playGame method and initializing the Graphics
@@ -111,15 +209,26 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         Graphics window = new Graphics();
         while(true) {
-            do {
-                //Play Game
-                playGame(window);
-                //Handles Post-Game
-                window.gameOver();
-                window.clearChips();
-            } while (window.getPlayAgain());
-            window.clearScore();
-            window.menuScreen();
+            if(!window.isOnline()) {
+                do {
+                    //Play Game
+                    playGame(window);
+                    //Handles Post-Game
+                    window.gameOver();
+                    window.clearChips();
+                } while (window.getPlayAgain());
+                window.clearScore();
+                window.menuScreen();
+            } else {
+                try {
+                    Socket socket = new Socket(window.getIPAddress(), 25565);
+                    window.displayMessage("");
+                    playOnline(window, socket);
+                } catch (ConnectException e) {
+                    window.displayMessage("Cannot connect to server...");
+                }
+
+            }
         }
     }
 }
