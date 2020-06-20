@@ -21,7 +21,7 @@ public class Graphics extends JFrame {
     //First in list
     String playerColor = "Red", computerColor = "Red";
     private int col = -1, p1Wins = 0, p2Wins = 0;
-    String p1Name = "Player 1", p2Name = "Computer";
+    String p1Name = "Player 1", p2Name = "Computer", serverAddress = "";
     AtomicReference<String> type = new AtomicReference<>("Singleplayer");
     private boolean playAgain = false;
     private final ArrayList<JLabel> chips = new ArrayList<>();
@@ -53,6 +53,7 @@ public class Graphics extends JFrame {
      */
     public void menuScreen() throws IOException {
         //Title
+        ArrayList<JComponent> elements = new ArrayList<>();
         BufferedImage titleImage = ImageIO.read(getClass().getResource("/res/GameLogo.png"));
         imageLabel = new JLabel(new ImageIcon(titleImage));
         imageLabel.setBounds(55, 0, 389, 170);
@@ -61,7 +62,7 @@ public class Graphics extends JFrame {
         frame.setVisible(true);
 
         //Mode Box
-        String[] modes = {"Singleplayer", "Multiplayer"};
+        String[] modes = {"Singleplayer", "Local Multiplayer", "Online Multiplayer"};
         JComboBox<String> gameType = new JComboBox<>(modes);
         gameType.addActionListener(e -> type.set((String) gameType.getSelectedItem()));
         gameType.setBounds(200, 250, 100, 20);
@@ -102,39 +103,54 @@ public class Graphics extends JFrame {
         cColor.setBounds(290, 350, 100, 20);
         pColor.setBounds(290, 300, 100, 20);
 
+        //IP Address
+        JLabel ipLabel = new JLabel("IP Address");
+        ipLabel.setBounds(40, 350, 100, 20);
+        JTextField ipText = new JTextField();
+        ipText.setBounds(140, 350, 100, 20);
+
+        //Join Game
+        JButton joinGame = new JButton("Join Game");
+        joinGame.setBounds(200, 430, 100, 20);
+
+        //Adds to list
+        elements.add(cNameText);
+        elements.add(pNameText);
+        elements.add(cName);
+        elements.add(pName);
+        elements.add(cColor);
+        elements.add(pColor);
+        elements.add(colorCList);
+        elements.add(colorPList);
+        elements.add(submit);
+        elements.add(ipText);
+        elements.add(ipLabel);
+        elements.add(joinGame);
+        elements.add(selectGame);
+        elements.add(gameType);
+        elements.add(imageLabel);
+
         //Adds to window
-        addInstance(layeredPane, cNameText, 0);
-        addInstance(layeredPane, pNameText, 0);
-        addInstance(layeredPane, cName, 0);
-        addInstance(layeredPane, pName, 0);
-        addInstance(layeredPane, cColor, 0);
-        addInstance(layeredPane, pColor, 0);
-        addInstance(layeredPane, colorCList, 0);
-        addInstance(layeredPane, colorPList, 0);
-        addInstance(layeredPane, submit, 0);
+        addInstance(layeredPane, elements, 0);
         playAgain = true;
+        joinGame.addActionListener(arg0 -> {
+            try {
+                removeInstance(layeredPane, elements);
+                serverAddress = ipText.getText();
+                p1Name = pNameText.getText();
+                type.set((String) gameType.getSelectedItem());
+                submitted.set(true);
+            } catch (NullPointerException ignored) { }
+        });
         submit.addActionListener(arg0 -> {
             try {
                 if (!playerColor.equals(computerColor)) {
                     //Removes instances if colors are not equal, initializes board (beginning game)
-                    removeInstance(layeredPane, cColor);
-                    removeInstance(layeredPane, pColor);
-                    removeInstance(layeredPane, colorCList);
-                    removeInstance(layeredPane, colorPList);
-                    removeInstance(layeredPane, submit);
-                    removeInstance(layeredPane, imageLabel);
-                    removeInstance(layeredPane, submit);
-                    removeInstance(layeredPane, cNameText);
-                    removeInstance(layeredPane, pNameText);
-                    removeInstance(layeredPane, cName);
-                    removeInstance(layeredPane, pName);
-                    removeInstance(layeredPane, gameType);
-                    removeInstance(layeredPane, selectGame);
+                    removeInstance(layeredPane, elements);
                     p1Name = pNameText.getText();
-                    p2Name = cNameText.getText();
                     type.set((String) gameType.getSelectedItem());
                     submitted.set(true);
-                    //Adds Board Image
+                    p2Name = cNameText.getText();
                     if (p1Name.equals("memes"))
                         executeMemes();
                     initializeBoard();
@@ -144,15 +160,36 @@ public class Graphics extends JFrame {
 
         //While loop to handle menu screen toggle
         while (!submitted.get()) {
-            if (type.get().equals("Multiplayer")) {
-                cColor.setText("Player 2 Color");
-                cName.setText("Player 2 Name");
+            if(type.get().equals("Local Multiplayer") || type.get().equals("Singleplayer"))
+            {
+                cColor.setVisible(true);
+                cName.setVisible(true);
+                colorCList.setVisible(true);
+                cNameText.setVisible(true);
+                ipLabel.setVisible(false);
+                ipText.setVisible(false);
+                submit.setVisible(true);
+                joinGame.setVisible(false);
+                if (type.get().equals("Local Multiplayer")) {
+                    cColor.setText("Player 2 Color");
+                    cName.setText("Player 2 Name");
+                } else if (type.get().equals("Singleplayer")) {
+                    cColor.setText("Computer Color");
+                    cName.setText("Computer Name");
+                }
             } else {
-                cColor.setText("Computer Color");
-                cName.setText("Computer Name");
+                cColor.setVisible(false);
+                cName.setVisible(false);
+                colorCList.setVisible(false);
+                cNameText.setVisible(false);
+                ipLabel.setVisible(true);
+                ipText.setVisible(true);
+                submit.setVisible(false);
+                joinGame.setVisible(true);
             }
         }
     }
+
 
     /*
     Adds the chip image onto the window, with the correct column, row, and color
@@ -211,6 +248,11 @@ public class Graphics extends JFrame {
         while(loopVar.get()){}
     }
 
+    public void setP2Color(String color)
+    {
+        computerColor = color;
+    }
+
     /*
     Clears all the chips from the window
      */
@@ -227,6 +269,11 @@ public class Graphics extends JFrame {
     public boolean getPlayAgain()
     {
         return playAgain;
+    }
+
+    public String getLocalPlayerColor()
+    {
+        return playerColor;
     }
 
     /*
@@ -248,6 +295,18 @@ public class Graphics extends JFrame {
     {
         removeInstance(layeredPane, this.message);
         this.message.setText(player + " won!");
+        this.message.setBounds(100, 300, 300, 30);
+        message.setFont(new Font("Serif", Font.BOLD, 20));
+        message.setHorizontalAlignment(JLabel.CENTER);
+        addInstance(layeredPane, this.message, 0);
+    }
+
+    /*
+    Displays a message on the window
+     */
+    public void displayMessage(String text) throws InterruptedException {
+        removeInstance(layeredPane, this.message);
+        this.message.setText(text);
         this.message.setBounds(100, 300, 300, 30);
         message.setFont(new Font("Serif", Font.BOLD, 20));
         message.setHorizontalAlignment(JLabel.CENTER);
@@ -288,6 +347,15 @@ public class Graphics extends JFrame {
         winCounter.setFont(new Font("Serif", Font.BOLD, 20));
         winCounter.setHorizontalAlignment(JLabel.CENTER);
         addInstance(layeredPane, winCounter, 0);
+    }
+
+    public void initLocalBoard() throws IOException
+    {
+        BufferedImage boardImage = ImageIO.read(getClass().getResource("/res/6x7_Board.jpg"));
+        board = new JLabel(new ImageIcon(boardImage));
+        board.setBounds(109, 0, 279, 275);
+        board.setAlignmentX(Component.CENTER_ALIGNMENT);
+        addInstance(layeredPane, board, 0);
     }
 
     /*
@@ -417,6 +485,22 @@ public class Graphics extends JFrame {
     }
 
     /*
+    Returns whether the game is online or not
+     */
+    public boolean isOnline()
+    {
+        return type.get().equals("Online Multiplayer");
+    }
+
+    /*
+    Returns the IP Address for online play
+     */
+    public String getIPAddress()
+    {
+        return serverAddress;
+    }
+
+    /*
     Remove an instance on a frame
      */
     public static void removeInstance(Container instance, JComponent type)
@@ -424,6 +508,14 @@ public class Graphics extends JFrame {
         instance.remove(type);
         instance.revalidate();
         instance.repaint();
+    }
+
+    public void removeInstance(Container instance, ArrayList<JComponent> elements) {
+        for(JComponent element : elements) {
+            instance.remove(element);
+            instance.revalidate();
+            instance.repaint();
+        }
     }
 
     /*
@@ -436,6 +528,14 @@ public class Graphics extends JFrame {
         instance.repaint();
     }
 
+    public static void addInstance(Container instance, ArrayList<JComponent> elements, int level)
+    {
+        for(JComponent element : elements) {
+            instance.add(element, level);
+            instance.revalidate();
+            instance.repaint();
+        }
+    }
     /*
     This method is not important
      */
